@@ -6,13 +6,13 @@ import {
   getSingleProduct,
   updateProduct,
 } from "../controller/productController.js";
-import { verifyUserAuth } from "../middleware/userAuth.js";
+import { roleBasedAccess, verifyUserAuth } from "../middleware/userAuth.js";
 const router = express.Router(); // creates new router object by using this we can easily handle HTTP request
 // Routes
-router.route("/products").get(verifyUserAuth,getAllProducts).post(createProducts);
+router.route("/products").get(verifyUserAuth,getAllProducts).post(verifyUserAuth ,roleBasedAccess("admin"), createProducts);
 router
   .route("/product/:id")
-  .put(updateProduct)
-  .delete(deleteProduct)
-  .get(getSingleProduct);
+  .put(verifyUserAuth,roleBasedAccess("admin"),updateProduct)
+  .delete(verifyUserAuth,roleBasedAccess("admin"),deleteProduct)
+  .get(verifyUserAuth,getSingleProduct);
 export default router;
