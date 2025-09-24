@@ -9,9 +9,10 @@ import {
 import { roleBasedAccess, verifyUserAuth } from "../middleware/userAuth.js";
 const router = express.Router(); // creates new router object by using this we can easily handle HTTP request
 // Routes
-router.route("/products").get(verifyUserAuth,getAllProducts).post(verifyUserAuth ,roleBasedAccess("admin"), createProducts);
+router.route("/products").get(getAllProducts)
+router.route("/admin/product/create").post(verifyUserAuth ,roleBasedAccess("admin"), createProducts);
 router
-  .route("/product/:id")
+.route("/product/:id")
   .put(verifyUserAuth,roleBasedAccess("admin"),updateProduct)
   .delete(verifyUserAuth,roleBasedAccess("admin"),deleteProduct)
   .get(verifyUserAuth,getSingleProduct);
