@@ -78,6 +78,7 @@ export const deleteProduct = handleAsyncError(async (req, res,next) => {
     message: "Product Deleted Successfully",
   });
 })
+ 
 // accessing single product
 export const getSingleProduct = handleAsyncError(async (req, res,next) => {
   const product = await Product.findById(req.params.id);
@@ -90,3 +91,49 @@ export const getSingleProduct = handleAsyncError(async (req, res,next) => {
   });
 }
 )
+// Creating and Updating Review
+export const createReviewForProduct=handleAsyncError(async(req,res,next)=>{
+  // console.log(req.body);
+  // console.log(req.user.id);
+  const {rating,comment,productId}=req.body
+  const product=await Product.findById(productId)
+  const review={
+    user:req.user._id,
+    name:req.user.name,
+    rating:Number(rating),
+    comment
+  }
+  console.log(product);
+  
+  if(!product){
+    return next(new HandleError("Product not found",400))
+  }
+ const reviewExits=product.reviews.find(review=>review.user.toString()===req.user.id)
+if(reviewExits){
+product.reviews.forEach(review=>{
+  if(req.user.toString()===req.user.id){
+    review.rating=rating,
+    review.comment=comment
+  }
+})
+}else{
+product.reviews.push(review)
+}
+  await product.save(
+   { validateBeforeSave:false}
+  )
+  res.status(200).json({
+    success:true,
+    message:"Review added sucessfully .",
+    product
+  })
+  
+})
+// Admin get all products
+export const getAdminProduct=handleAsyncError(async(req,res,next)=>{
+  const products=await Product.find();
+  res.status(200).json({
+    success:true,
+    products
+  })
+})

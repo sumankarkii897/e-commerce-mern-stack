@@ -1,7 +1,9 @@
 import express from "express";
 import {
   createProducts,
+  createReviewForProduct,
   deleteProduct,
+  getAdminProduct,
   getAllProducts,
   getSingleProduct,
   updateProduct,
@@ -12,8 +14,11 @@ const router = express.Router(); // creates new router object by using this we c
 router.route("/products").get(getAllProducts)
 router.route("/admin/product/create").post(verifyUserAuth ,roleBasedAccess("admin"), createProducts);
 router
-.route("/product/:id")
+.route("/admin/product/:id")
   .put(verifyUserAuth,roleBasedAccess("admin"),updateProduct)
   .delete(verifyUserAuth,roleBasedAccess("admin"),deleteProduct)
-  .get(verifyUserAuth,getSingleProduct);
+  
+  router.route("/product/:id").get(getSingleProduct);
+  router.route("/review").put(verifyUserAuth,createReviewForProduct);
+  router.route("/admin/products").get(verifyUserAuth,roleBasedAccess("admin"),getAdminProduct)
 export default router;
