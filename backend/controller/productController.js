@@ -2,6 +2,8 @@ import Product from "../models/productModel.js";
 import HandleError from "../utils/handleError.js";
 import handleAsyncError from "../middleware/handleAsyncError.js";
 import APIFunctionality from "../utils/apiFunctionality.js";
+import { privateDecrypt } from "crypto";
+import { trusted } from "mongoose";
 // Creating products
 export const createProducts = handleAsyncError(async (req, res,next) => {
   req.body.user=req.user.id;
@@ -103,22 +105,30 @@ export const createReviewForProduct=handleAsyncError(async(req,res,next)=>{
     rating:Number(rating),
     comment
   }
-  console.log(product);
+  // console.log(product);
   
   if(!product){
     return next(new HandleError("Product not found",400))
   }
- const reviewExits=product.reviews.find(review=>review.user.toString()===req.user.id)
+ const reviewExits=product.reviews.find(review=>review.user.toString()===req.user.id.toString())
 if(reviewExits){
 product.reviews.forEach(review=>{
-  if(req.user.toString()===req.user.id){
+  if(review.user.toString()===req.user.id.toString()){
     review.rating=rating,
     review.comment=comment
   }
 })
 }else{
 product.reviews.push(review)
+
 }
+product.numOfReviews=product.reviews.length
+let sum=0;
+product.reviews.forEach(review=>{
+  sum+=review.rating
+})
+
+product.ratings=product.reviews.length>0?sum/product.reviews.length:0
   await product.save(
    { validateBeforeSave:false}
   )
@@ -128,6 +138,51 @@ product.reviews.push(review)
     product
   })
   
+})
+// Getting reviews
+export const getReview=handleAsyncError(async(req,res,next)=>{
+  const product=await Product.findById(req.query.id)
+  if(!product){
+    return next(new HandleError("Product Not Found",400))
+  }
+  const reviews=product.reviews
+
+  
+  res.status(200).json({
+    success:true,
+    reviews
+  })
+})
+//Deleting reviews
+export const deleteReview=handleAsyncError(async(req,res,next)=>{
+
+  
+  const product=await Product.findById(req.query.productId)
+  if(!product){
+    return next(new HandleError("Product Not Found",400))
+  }
+   const reviewId=req.query.id.toString();
+  const reviews=product.reviews.filter(review=>review._id.toString()!==reviewId)
+// console.log(reviews);
+let sum=0;
+reviews.forEach(review=>{
+  sum+=review.rating
+})
+const ratings=reviews.length > 0 ?sum/reviews.length : 0
+
+const numOfReviews=reviews.length
+await Product.findByIdAndUpdate(req.query.productId,{
+  reviews,
+  ratings,
+  numOfReviews
+},{
+  new:true,
+  runValidators:true
+})
+res.status(200).json({
+  success:true,
+  message:"Review Deleted Sucessfully.."
+})
 })
 // Admin get all products
 export const getAdminProduct=handleAsyncError(async(req,res,next)=>{

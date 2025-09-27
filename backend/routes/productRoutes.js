@@ -3,8 +3,10 @@ import {
   createProducts,
   createReviewForProduct,
   deleteProduct,
+  deleteReview,
   getAdminProduct,
   getAllProducts,
+  getReview,
   getSingleProduct,
   updateProduct,
 } from "../controller/productController.js";
@@ -19,6 +21,7 @@ router
   .delete(verifyUserAuth,roleBasedAccess("admin"),deleteProduct)
   
   router.route("/product/:id").get(getSingleProduct);
-  router.route("/review").put(verifyUserAuth,createReviewForProduct);
+  router.route("/review").put(verifyUserAuth,createReviewForProduct).get(getReview)
+  router.route("/reviews").get(getReview).delete(verifyUserAuth,deleteReview)
   router.route("/admin/products").get(verifyUserAuth,roleBasedAccess("admin"),getAdminProduct)
 export default router;
