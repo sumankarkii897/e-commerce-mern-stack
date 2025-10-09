@@ -18,7 +18,7 @@ export const createProducts = handleAsyncError(async (req, res,next) => {
 // get all Products
 export const getAllProducts = handleAsyncError(async (req, res,next) => {
   // console.log(req.query);
-  const resultPerPage=3;
+  const resultPerPage=4;
   const apiFeatures=new APIFunctionality(Product.find(),req.query).search().filter();
   // getting filetered query before pagination
   const fileteredQuery=apiFeatures.query.clone();
