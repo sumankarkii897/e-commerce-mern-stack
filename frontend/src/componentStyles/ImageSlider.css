@@ -3,7 +3,7 @@
     width: 100%;
     height: 450px; 
     overflow: hidden;
-    margin-top: 6rem;
+    margin-top: 5rem;
   }
   
   .slider-images {
@@ -19,7 +19,7 @@
   .slider-item img {
     width: 100%; 
     height: 450px; 
-    object-fit: cover; 
+    /* object-fit: cover;  */
   }
   
   .slider-dots {
