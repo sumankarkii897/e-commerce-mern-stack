@@ -5,6 +5,12 @@ class APIFunctionality{
     }
     search(){
         const keyword=this.queryStr.keyword?{
+            // $or:[{name:{
+            //     $regex:this.queryStr.keyword,
+            //     $options:"i"  // for case insensitive
+            // }},{
+
+            // }]
             name:{
                 $regex:this.queryStr.keyword,
                 $options:"i"  // for case insensitive
