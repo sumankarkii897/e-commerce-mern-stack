@@ -3,9 +3,17 @@ import {createSlice,createAsyncThunk
 } from "@reduxjs/toolkit";
 import axios from "axios";
 
-export const getProduct=createAsyncThunk('product/getProduct',async(_,{rejectWithValue})=>{
+export const getProduct=createAsyncThunk('product/getProduct',async({keyword,page=1,category},{rejectWithValue})=>{
 try {
-    const link='/api/v1/products'
+    let link='/api/v1/products?page='+page;
+    if(category){
+        link+=`&category=${category}`
+    }
+    if(keyword){
+        link+=`&keyword=${keyword}`
+    }
+    // const link =keyword?`/api/v1/products?keyword=${encodeURIComponent(keyword)}&page=${page}`:`/api/v1/products?page=${page}`
+    // const link='/api/v1/products'
     const {data}=await axios.get(link)
     console.log("Response",data);
     return data
@@ -34,6 +42,9 @@ const productSlice=createSlice({
         loading:false,
         error:null,
         product:null,
+        resultsPerPage:4,
+        totalPages:0
+
     },
     reducers:{
         removeErrors:(state)=>{
@@ -51,12 +62,14 @@ state.loading=false;
 state.error=null;
 state.products=action.payload.products;
 state.productCount=action.payload.productCount;
+state.resultsPerPage=action.payload.resultsPerPage;
+state.totalPages=action.payload.totalPages;
 
 })
 .addCase(getProduct.rejected,(state,action)=>{
 state.loading=false;
 state.error=action.payload || "Something went wrong";
-
+state.products=[]
 })
 builder.addCase(getProductDetails.pending,(state)=>{
     state.loading=true;
