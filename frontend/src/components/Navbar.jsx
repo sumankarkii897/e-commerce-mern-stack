@@ -14,7 +14,7 @@ function Navbar() {
     const toggleSearch=()=>setIsSearchOpen(!isSearchOpen)
     const toggleMenu=()=>setIsMenuOpen(!isMenuOpen);
     
-    const isAuthenticated=true;
+    const isAuthenticated=false;
     const navigate=useNavigate();
     const handleSearchSubmit=(e)=>{
 e.preventDefault();
@@ -63,6 +63,7 @@ setSearchQuery("")
             </div>
             {!isAuthenticated && <Link to="/register" className='register-link'>
             <PersonAddIcon className="icon"/>
+           
             </Link>}
             <div className="navbar-hamburger "onClick={toggleMenu}>
               {isMenuOpen?  <CloseIcon className='icon'/>:
