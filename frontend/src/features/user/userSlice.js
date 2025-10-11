@@ -2,7 +2,7 @@ import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { act } from "react";
 /* Register Api*/
-export const register=createAsyncThunk('use/register',async(useRouteLoaderData,{rejectWithValue})=>{
+export const register=createAsyncThunk('use/register',async(userData,{rejectWithValue})=>{
 try {
    const config={
     headers:{
@@ -15,6 +15,8 @@ console.log("Registration Data",data);
 return data
 
 } catch (error) {
+    console.log('Registration Error:', error.response?.data, error.message);
+    
    return rejectWithValue(error.response?.data || "Registration Failed. Please try again later.")
 }})
 /* login api */
@@ -34,7 +36,24 @@ export const login=createAsyncThunk('user/login',async ({email,password},{reject
    } 
 }
 )
+export const loadUser=createAsyncThunk("user/loadUser",async(_,{rejectWithValue})=>{
+    try {
+        const {data}=await axios.get("/api/v1/profile");
+        return data
+    } catch (error) {
+            return rejectWithValue(error.response?.data || "Failed to load User Profile.")
 
+    }
+})
+export const logout=createAsyncThunk("user/logout",async(_,{rejectWithValue})=>{
+    try {
+        const {data}=await axios.post("/api/v1/logout",{withCredentials:true});
+        return data
+    } catch (error) {
+            return rejectWithValue(error.response?.data || "Logout Failed.")
+
+    }
+})
 const userSlice=createSlice({
     name:'user',
     initialState:{
@@ -52,9 +71,9 @@ const userSlice=createSlice({
             state.success=null
         }
     },
-    extraReducers:(builer)=>{
+    extraReducers:(builder)=>{
         /* Registration Cases */
-        builer.addCase(register.pending,(state)=>{
+        builder.addCase(register.pending,(state)=>{
             state.loading=true;
             state.error=null;
         })
@@ -72,7 +91,8 @@ const userSlice=createSlice({
             state.isAuthenticated=false;
         })
         /* Login Case */
-          builer.addCase(login.pending,(state)=>{
+    
+          builder.addCase(login.pending,(state)=>{
             state.loading=true;
             state.error=null;
         })
@@ -91,7 +111,47 @@ const userSlice=createSlice({
             state.user=null;
             state.isAuthenticated=false;
         })
+
+    /* loading user */
+          builder.addCase(loadUser.pending,(state)=>{
+            state.loading=true;
+            state.error=null;
+        })
+        .addCase(loadUser.fulfilled,(state,action)=>{
+            state.loading=false;
+            state.error=null;
+            //state.success=action.payload.success;
+            state.user=action.payload?.user || null;
+            state.isAuthenticated=Boolean(action.payload?.user);
+            
+            
+        })
+        .addCase(loadUser.rejected,(state,action)=>{
+            state.loading=false;
+            state.error=action.payload?.message || "Failed to load User Profile";
+            state.user=null;
+            state.isAuthenticated=false;
+        })
+        /* logout user */
+          builder.addCase(logout.pending,(state)=>{
+            state.loading=true;
+            state.error=null;
+        })
+        .addCase(logout.fulfilled,(state,action)=>{
+            state.loading=false;
+            state.error=null;
+            state.user=null;
+            state.isAuthenticated=false;
+            
+            
+        })
+        .addCase(logout.rejected,(state,action)=>{
+            state.loading=false;
+            state.error=action.payload?.message || "Failed to logout";
+            
+        })
     }
 })
+
 export const {removeErrors,removeSuccess}=userSlice.actions;
 export default userSlice.reducer;

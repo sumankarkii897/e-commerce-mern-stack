@@ -4,19 +4,77 @@ import HandleError from "../utils/handleError.js";
 import { sendToken } from "../utils/jwtToken.js";
 import { sendEmail } from "../utils/sendEmail.js";
 import crypto from "crypto"
-export const registerUser=handleAsyncError(async(req,res,next)=>{
-    const {name,email,password}=req.body;
-    const user=await User.create({
-        name,
-        email,
-        password,
-        avatar:{
-            public_id:"this is temp id",
-            url:"This is temp url"
-        }
-    })
-    sendToken(user,201,res)
-})
+import {v2 as cloudinary} from 'cloudinary';
+// export const registerUser=handleAsyncError(async(req,res,next)=>{
+//     const {name,email,password,avatar}=req.body;
+//     const myCloud=await cloudinary.uploader.upload(avatar,{
+//         folder:'avatars',
+//         width:150,
+//         crop:"scale"
+//     })
+//     const user=await User.create({
+//         name,
+//         email,
+//         password,
+//         avatar:{
+//             public_id:"this is temp id",
+//             url:"This is temp url"
+//         }
+//     })
+//     sendToken(user,201,res)
+// })
+
+
+export const registerUser = handleAsyncError(async (req, res, next) => {
+  const { name, email, password, avatar } = req.body;
+
+  // Validate required fields
+  if (!name || !email || !password) {
+    return next(new HandleError('Please provide all required fields', 400));
+  }
+
+  let avatarData = {
+    public_id: null,
+    url: null,
+  };
+
+  // Handle avatar upload if provided
+  if (avatar) {
+    try {
+      // Ensure avatar is a valid base64 string
+      const base64Regex = /^[A-Za-z0-9+/=]+$/;
+      if (!base64Regex.test(avatar)) {
+        return next(new HandleError('Invalid base64 format for avatar', 400));
+      }
+
+      // Upload to Cloudinary
+      const myCloud = await cloudinary.uploader.upload(`data:image/jpeg;base64,${avatar}`, {
+        folder: 'avatars',
+        width: 150,
+        crop: 'scale',
+      });
+    
+
+      avatarData = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      };
+    } catch (error) {
+      console.error('Cloudinary Upload Error:', error.message);
+      return next(new HandleError('Could not upload avatar to Cloudinary', 400));
+    }
+  }
+
+  // Create user
+  const user = await User.create({
+    name,
+    email,
+    password,
+    avatar: avatarData,
+  });
+
+  sendToken(user, 201, res);
+});
 
 // login
 export const loginUser=handleAsyncError(async(req,res,next)=>{

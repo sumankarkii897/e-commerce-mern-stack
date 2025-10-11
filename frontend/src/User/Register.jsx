@@ -19,16 +19,45 @@ function Register() {
     const dispatch=useDispatch()
     const navigate=useNavigate();
     const registerDataChange=(e)=>{
-if(e.target.name==="avatar"){
-const reader=new FileReader();
-reader.onload=()=>{
-    if(reader.readyState===2){
-        setAvatarPreview(reader.result)
-        setAvatar(reader.result)
-    }
-}
-reader.readAsDataURL(e.target.files[0])
-}
+// if(e.target.name==="avatar"){
+// const reader=new FileReader();
+// reader.onload=()=>{
+//     if(reader.readyState===2){
+//         setAvatarPreview(reader.result)
+//         setAvatar(reader.result)
+//     }
+// }
+// reader.readAsDataURL(e.target.files[0])
+// }
+if (e.target.name === 'avatar') {
+      const file = e.target.files[0];
+      if (file) {
+        const validImageTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        if (!validImageTypes.includes(file.type)) {
+          toast.error('Please upload a valid image (JPEG, PNG, GIF)', {
+            position: 'top-center',
+            autoClose: 3000,
+          });
+          return;
+        }
+        if (file.size > 5 * 1024 * 1024) {
+          toast.error('Image size should be less than 5MB', {
+            position: 'top-center',
+            autoClose: 3000,
+          });
+          return;
+        }
+        const reader = new FileReader();
+        reader.onload = () => {
+          if (reader.readyState === 2) {
+            setAvatarPreview(reader.result);
+            // Remove the data:image/<type>;base64, prefix
+            const base64String = reader.result.split(',')[1];
+            setAvatar(base64String); // Store only the base64 data
+          }
+        };
+        reader.readAsDataURL(file);
+      } }
 else{
     setUser({
         ...user,[e.target.name]:e.target.value
@@ -86,10 +115,10 @@ return;
                 <input type="password" name="password" id="" placeholder='Password' value={password} onChange={registerDataChange}/>
             </div>
             <div className="input-group avatar-group">
-                <input type="file" name="avatar"  className='file-input' accept='image/' onChange={registerDataChange}/>
+                <input type="file" name="avatar"  className='file-input' accept='image/*' onChange={registerDataChange}/>
                 <img src={avatarPreview} alt="Avatar Preview" className='avatar' />
             </div>
-           <button className="authBtn">Sign Up</button>
+           <button className="authBtn">{loading?"Signing Up":"Sign Up"}</button>
            <p className="form-links">
             Already have an account ? <Link to="/login">Sing in here</Link>
            </p>
