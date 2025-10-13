@@ -11,7 +11,8 @@ import { loadUser } from './features/user/userSlice'
 import UserDashboard from './User/UserDashboard'
 import Profile from './User/Profile'
 import ProtectedRoutes from './components/ProtectedRoutes'
-import UpdateProfle from './User/UpdateProfle'
+
+import UpdateProfile from './User/UpdateProfile'
 function App() {
   const {isAuthenticated,user}=useSelector(state=>state.user)
   const dispatch=useDispatch()
@@ -30,7 +31,7 @@ function App() {
       <Route path='/register' element={<Register></Register>}/>
       <Route path='/login' element={<Login/>}/>
       <Route path='/profile' element={<ProtectedRoutes element={<Profile/>}/>}/>
-      <Route path="/profile/update" element={<ProtectedRoutes element={<UpdateProfle/>}/>}/>
+      <Route path="/profile/update" element={<ProtectedRoutes element={<UpdateProfile/>}/>}/>
       </Routes>
       {isAuthenticated && <UserDashboard user={user}/>}
       

@@ -54,6 +54,20 @@ export const logout=createAsyncThunk("user/logout",async(_,{rejectWithValue})=>{
 
     }
 })
+export const updateProfile=createAsyncThunk("user/updateProfile",async(userData,{rejectWithValue})=>{
+    try {
+        const config={ 
+            headers:{
+                'Content-type':'multipart/form-data'
+            }
+        }
+        const {data}=await axios.post("/api/v1/profile/update",userData,config);
+        return data
+    } catch (error) {
+            return rejectWithValue(error.response?.data || {message:"Profile update File.Please try again later."})
+
+    }
+})
 const userSlice=createSlice({
     name:'user',
     initialState:{
@@ -61,7 +75,8 @@ const userSlice=createSlice({
         loading:false,
         error:null,
         success:false,
-        isAuthenticated:false
+        isAuthenticated:false,
+        message:null
     },
     reducers:{
         removeErrors:(state)=>{
@@ -148,6 +163,23 @@ const userSlice=createSlice({
         .addCase(logout.rejected,(state,action)=>{
             state.loading=false;
             state.error=action.payload?.message || "Failed to logout";
+            
+        })
+        /* update User Profile*/
+         builder.addCase(updateProfile.pending,(state)=>{
+            state.loading=true;
+            state.error=null;
+        })
+        .addCase(updateProfile.fulfilled,(state,action)=>{
+            state.loading=false;
+            state.error=null;
+            state.user=action.payload?.user || null;
+            state.success=action.payload?.success
+            state.message=action.payload?.message
+        })
+        .addCase(updateProfile.rejected,(state,action)=>{
+            state.loading=false;
+            state.error=action.payload?.message || "Profile Update Failed . Please try again later.";
             
         })
     }

@@ -198,10 +198,54 @@ sendToken(user,200,res)
 }))
 //updating user profile
 export const updateProfile=handleAsyncError(async(req,res,next)=>{
-const {name,email}=req.body;
+const {name,email,avatar}=req.body;
 const updateUserDetails={
     name,
     email
+}
+/* if(avatar && avatar!== ""){
+const user= await User.findById(req.user.id);
+const imageId=user.avatar.public_id
+await cloudinary.uploader.destroy(imageId)
+const myCloud=await cloudinary.uploader.upload(avatar,{
+    folder:"avatars",
+    width:150,
+    crop:'scale'
+})
+updateUserDetails.avatar={
+    public_id:myCloud.public_id,
+    url:myCloud.secure_url,
+
+} */
+if (avatar && avatar !== "") {
+    try {
+      const user = await User.findById(req.user.id);
+
+      // ✅ Delete previous avatar safely (if it exists)
+      if (user.avatar && user.avatar.public_id) {
+        await cloudinary.uploader.destroy(user.avatar.public_id);
+      }
+
+      // ✅ Handle both plain base64 and data URLs
+      const uploadData =
+        avatar.startsWith("data:image") ? avatar : `data:image/jpeg;base64,${avatar}`;
+
+      // ✅ Upload new avatar to Cloudinary
+      const myCloud = await cloudinary.uploader.upload(uploadData, {
+        folder: "avatars",
+        width: 150,
+        crop: "scale",
+      });
+
+      // ✅ Store new avatar info
+      updateUserDetails.avatar = {
+        public_id: myCloud.public_id,
+        url: myCloud.secure_url,
+      };
+    } catch (error) {
+      console.error("Cloudinary Upload Error:", error.message);
+      return next(new HandleError("Could not upload avatar to Cloudinary", 400));
+    }
 }
 const user=await User.findByIdAndUpdate(req.user.id,updateUserDetails,{
     new:true,
