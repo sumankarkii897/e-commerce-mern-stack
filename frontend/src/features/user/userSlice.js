@@ -1,6 +1,6 @@
 import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
-import { act } from "react";
+
 /* Register Api*/
 export const register=createAsyncThunk('use/register',async(userData,{rejectWithValue})=>{
 try {
@@ -45,6 +45,7 @@ export const loadUser=createAsyncThunk("user/loadUser",async(_,{rejectWithValue}
 
     }
 })
+/* logout api */
 export const logout=createAsyncThunk("user/logout",async(_,{rejectWithValue})=>{
     try {
         const {data}=await axios.post("/api/v1/logout",{withCredentials:true});
@@ -54,6 +55,7 @@ export const logout=createAsyncThunk("user/logout",async(_,{rejectWithValue})=>{
 
     }
 })
+/* updateProfile api */
 export const updateProfile=createAsyncThunk("user/updateProfile",async(userData,{rejectWithValue})=>{
     try {
         const config={ 
@@ -61,11 +63,42 @@ export const updateProfile=createAsyncThunk("user/updateProfile",async(userData,
                 'Content-type':'multipart/form-data'
             }
         }
-        const {data}=await axios.post("/api/v1/profile/update",userData,config);
+        const {data}=await axios.put("/api/v1/profile/update",userData,config);
         return data
     } catch (error) {
-            return rejectWithValue(error.response?.data || {message:"Profile update File.Please try again later."})
+            return rejectWithValue(error.response?.data || {message:"Profile update Failed.Please try again later."})
 
+    }
+})
+/* updatePassword api */
+export const updatePassword=createAsyncThunk("user/updatePassword",async(formData,{rejectWithValue})=>{
+    try {
+        const config={
+            headers:{
+                'Content-Type':"application/json"
+            }
+        }
+        const {data}=await axios.put("/api/v1/password/update",formData,config)
+        
+        
+        return data
+    } catch (error) {
+        return rejectWithValue(error.response?.data || "Password Update Failed")
+        
+    }
+})
+/* forgot Password api */
+export const forgotPassword=createAsyncThunk("user/forgotPassword",async(email,{rejectWithValue})=>{
+    try {
+       const config={
+            headers:{
+                'Content-Type':"application/json"
+            }
+        }
+       const {data}=await axios.post("/api/v1/password/forgot",email,config)
+       return data
+    } catch (error) {
+        return rejectWithValue(error.response?.data || {message:"Failed to Send Email"})
     }
 })
 const userSlice=createSlice({
@@ -181,6 +214,41 @@ const userSlice=createSlice({
             state.loading=false;
             state.error=action.payload?.message || "Profile Update Failed . Please try again later.";
             
+        })
+         /* update User Password*/
+         builder.addCase(updatePassword.pending,(state)=>{
+            state.loading=true;
+            state.error=null;
+        })
+        .addCase(updatePassword.fulfilled,(state,action)=>{
+            state.loading=false;
+            state.error=null;
+            
+            state.success=action.payload?.success
+            
+        })
+        .addCase(updatePassword.rejected,(state,action)=>{
+            state.loading=false;
+state.error = (action.payload && action.payload.message) || action.payload || "Password Update Failed";
+
+        
+            
+        })
+        /* forgot password */
+          builder.addCase(forgotPassword.pending,(state)=>{
+            state.loading=true;
+            state.error=null;
+        })
+        .addCase(forgotPassword.fulfilled,(state,action)=>{
+            state.loading=false;
+            state.error=null;
+            state.success=action.payload?.success
+            state.message=action.payload?.message
+            
+        })
+        .addCase(forgotPassword.rejected,(state,action)=>{
+            state.loading=false;
+state.error =  action.payload?.message || "Failed to Send Email";     
         })
     }
 })

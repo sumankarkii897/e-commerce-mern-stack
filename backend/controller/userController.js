@@ -221,23 +221,23 @@ if (avatar && avatar !== "") {
     try {
       const user = await User.findById(req.user.id);
 
-      // ✅ Delete previous avatar safely (if it exists)
+      // Delete previous avatar safely (if it exists)
       if (user.avatar && user.avatar.public_id) {
         await cloudinary.uploader.destroy(user.avatar.public_id);
       }
 
-      // ✅ Handle both plain base64 and data URLs
+      //  Handle both plain base64 and data URLs
       const uploadData =
         avatar.startsWith("data:image") ? avatar : `data:image/jpeg;base64,${avatar}`;
 
-      // ✅ Upload new avatar to Cloudinary
+      // Upload new avatar to Cloudinary
       const myCloud = await cloudinary.uploader.upload(uploadData, {
         folder: "avatars",
         width: 150,
         crop: "scale",
       });
 
-      // ✅ Store new avatar info
+      // Store new avatar info
       updateUserDetails.avatar = {
         public_id: myCloud.public_id,
         url: myCloud.secure_url,

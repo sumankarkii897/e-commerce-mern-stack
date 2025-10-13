@@ -52,7 +52,7 @@ if(success){
             </div>
             <button className="authBtn">Log In</button>
             <p className="form-links">Forgot your password ? <Link to="/password/forgot">Reset Here</Link></p>
-            <p className="form-links">Don't Have an Accout  ? <Link to="/register">Singup Here</Link></p>
+            <p className="form-links">Don't Have an Accout  ? <Link to="/register">Signup Here</Link></p>
     </form>
 </div>
 
