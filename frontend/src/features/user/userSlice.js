@@ -92,7 +92,7 @@ export const forgotPassword=createAsyncThunk("user/forgotPassword",async(email,{
     try {
        const config={
             headers:{
-                'Content-Type':"application/json"
+                'Content-type':'application/json'
             }
         }
        const {data}=await axios.post("/api/v1/password/forgot",email,config)

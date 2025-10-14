@@ -37,28 +37,31 @@ if(error){
     
    },[dispatch,success])
   return (
-   <>
-   
-   <Navbar/>
-     <div className="form-container container">
-<div className="form-content">
-    <form action="" className='form'  onSubmit={forgotPasswordEmail}>
-    <h2>Forgot Password</h2>
+    <>
     
+    {loading ? (<Loader/>) :(  <>
+      
+      <Navbar/>
+        <div className="form-container container">
+   <div className="form-content">
+       <form action="" className='form'  onSubmit={forgotPasswordEmail}>
+       <h2>Forgot Password</h2>
        
-            <div className="input-group">
-                <input type="email"  id="" placeholder='Email' value={email} onChange={(e)=>{setEmail(e.target.value)}}/>
-            </div>
           
-           
-            <button className="authBtn">Send</button>
-            
-    </form>
-</div>
-
-</div>
-<Footer/>
-   </>
+               <div className="input-group">
+                   <input type="email"  id="" placeholder='Email' value={email} onChange={(e)=>{setEmail(e.target.value)}}/>
+               </div>
+             
+              
+               <button className="authBtn">Send</button>
+               
+       </form>
+   </div>
+   
+   </div>
+   <Footer/>
+      </>)}
+    </>
   )
 }
 
