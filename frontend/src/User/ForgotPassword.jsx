@@ -6,16 +6,18 @@ import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import { toast } from 'react-toastify'
 import { forgotPassword, removeErrors, removeSuccess } from '../features/user/userSlice'
-
+import Loader from "../components/Loader"
 function ForgotPassword() {
     const {loading,error,success,message}=useSelector(state=>state.user)
    const [email,setEmail]=useState("")
    const dispatch=useDispatch()
+   const navigate=useNavigate()
    const forgotPasswordEmail=(e)=>{
     e.preventDefault()
     const myForm=new FormData()
     myForm.set("email",email)
     dispatch(forgotPassword(myForm))
+    setEmail("")
    }
    useEffect(()=>{
 if(error){
@@ -31,7 +33,9 @@ if(error){
         toast.success(message,{
             position:"top-center",
             autoClose:3000
+            
         })
+        navigate("/")
         dispatch(removeSuccess())
     }
     

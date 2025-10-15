@@ -88,6 +88,11 @@
     cursor: pointer;
     font-size: 18px;
     border-radius: 4px;
+    /* text-align: center; */
+     transition: all 0.2s ease-in-out;
+      display: flex;
+  align-items: center;
+  justify-content: center;
   }
   
   

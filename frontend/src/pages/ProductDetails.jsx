@@ -8,14 +8,43 @@ import {useDispatch, useSelector} from "react-redux"
 import { useParams } from 'react-router-dom'
 import { getProductDetails, removeErrors } from '../features/products/productSlice'
 import {toast} from "react-toastify"
+import { addItemsToCart, removeMessage } from '../features/cart/cartSlice'
 function ProductDetails() {
     const [userRating,setUserRating]=useState(0)
+    const [quantity,setQuantity]=useState(1)
     const handleRatingChange=(newRating)=>{
         setUserRating(newRating)
         
         
     }
+    const decreaseQuantity=()=>{
+        if(quantity <= 1){
+toast.warn("Quantity cannot be less than 1" ,{
+    position:"top-center",
+    autoClose:3000
+})
+        }
+        else{
+
+            setQuantity(quantity-1)
+        }
+    }
+    const increaseQuantity=()=>{
+        if(quantity < product.stock)
+{setQuantity(quantity+1)}
+        else{
+            toast.warning("above stock limit" ,{
+                position:"top-center",
+                autoClose:3000
+            })
+            return
+        }
+    }
    const {loading,error,product}= useSelector((state)=>state.product)
+   /* cart state */
+   const {loading:cartLoading,error:cartError,success,message,cartItems}=useSelector((state)=>state.cart)
+   console.log(cartItems);
+   
    const dispatch=useDispatch();
 //    console.log(useParams());
 const {id}=useParams();
@@ -36,7 +65,20 @@ if(error){
     })
     dispatch(removeErrors())
 }
-  },[dispatch,error]) 
+if(cartError){
+    toast.error(cartError,{
+        position:'top-center',
+        autoClose:3000
+    })
+}
+  },[dispatch,error,cartError]) 
+  /* for success */
+  useEffect(()=>{
+    if(success){
+        toast.success(message,{position:'top-center',autoClose:3000});
+        dispatch(removeMessage())
+    }
+  },[dispatch,success,message])
   if(loading){
     return (
         <>
@@ -56,6 +98,9 @@ if(error){
         <Footer/>
         </>
     )
+  }
+  const addToCart=()=>{
+    dispatch(addItemsToCart({id,quantity}))
   }
   return (
     <>
@@ -83,12 +128,12 @@ if(error){
            { product.stock > 0 && (<> 
             <div className="quantity-controls">
                 <span className="quantity-label">Quantity</span>
-                <button className="quantity-button">-
+                <button className="quantity-button"onClick={decreaseQuantity}>-
                 </button>
-                <input type="text" name="" id="" value={1} className='quantity-value' readOnly/>
-                <button className='quantity-button'>+</button>
+                <input type="text" name="" id="" value={quantity} className='quantity-value' readOnly/>
+                <button className='quantity-button'onClick={increaseQuantity}>+</button>
             </div>
-            <button className="add-to-cart-btn">Add to Cart</button>
+            <button className="add-to-cart-btn" disabled={cartLoading} onClick={addToCart}>{cartLoading ? "Adding  " : "Add to Cart"}</button>
             </>)
             }
             <form action="" className="review-form">

@@ -120,7 +120,7 @@ return;
             </div>
            <button className="authBtn">{loading?"Signing Up":"Sign Up"}</button>
            <p className="form-links">
-            Already have an account ? <Link to="/login">Sing in here</Link>
+            Already have an account ? <Link to="/login">Sign in here</Link>
            </p>
         </form>
     </div>

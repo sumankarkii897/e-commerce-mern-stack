@@ -1,6 +1,7 @@
 import { createSlice,createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+
 /* Register Api*/
 export const register=createAsyncThunk('use/register',async(userData,{rejectWithValue})=>{
 try {
@@ -97,6 +98,20 @@ export const forgotPassword=createAsyncThunk("user/forgotPassword",async(email,{
         }
        const {data}=await axios.post("/api/v1/password/forgot",email,config)
        return data
+    } catch (error) {
+        return rejectWithValue(error.response?.data || {message:"Failed to Send Email"})
+    }
+})
+/* reset Password */
+export const resetPassword=createAsyncThunk("user/restPassword",async({token,userData},{rejectWithValue})=>{
+    try {
+        const config={
+            headers:{
+                "Content-Type":"application/json"
+            }
+        }
+        const {data}=await axios.post(`/api/v1/reset/${token}`,userData,config)
+        return data
     } catch (error) {
         return rejectWithValue(error.response?.data || {message:"Failed to Send Email"})
     }
@@ -249,6 +264,23 @@ state.error = (action.payload && action.payload.message) || action.payload || "P
         .addCase(forgotPassword.rejected,(state,action)=>{
             state.loading=false;
 state.error =  action.payload?.message || "Failed to Send Email";     
+        })
+        /* reset Password*/
+        builder.addCase(resetPassword.pending,(state)=>{
+            state.loading=true;
+            state.error=null;
+        })
+        .addCase(resetPassword.fulfilled,(state,action)=>{
+            state.loading=false;
+            state.error=null;
+            state.success=action.payload?.success
+            //state.message=action.payload?.message
+            state.user=null;
+            state.isAuthenticated=false;
+        })
+        .addCase(resetPassword.rejected,(state,action)=>{
+            state.loading=false;
+            state.error=action.payload?.message || "Failed to Send Email";
         })
     }
 })
