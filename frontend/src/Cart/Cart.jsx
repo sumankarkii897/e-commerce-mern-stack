@@ -4,11 +4,33 @@ import PageTitle from '../components/PageTitle'
 import Navbar from '../components/Navbar'
 import Footer from '../components/Footer'
 import CartItem from './CartItem'
+import { useSelector } from 'react-redux'
+import { Link } from 'react-router-dom'
 function Cart() {
+    const {cartItems}=useSelector(state=>state.cart)
+    console.log("Cart Items " ,cartItems);
+    // let subTotal=0;
+    // cartItems.map((item)=>subTotal+=item.price*item.quantity)
+    const subTotal=cartItems.reduce((acc,item)=>acc+item.price*item.quantity,0)
+    let tax=0.13*subTotal.toFixed(2);
+    let shippingCharge=subTotal > 5000 ?500:0;
+    let totalPrice=(subTotal+tax+shippingCharge).toFixed(2);
   return (
- <>
+<> 
  <PageTitle title="Cart"/>
- <Navbar/>
+<Navbar/>
+{cartItems.length===0 ? (
+   <>
+   
+    <div className='empty-cart-container'>
+        <p className="empty-cart-message">Your Cart is Empty</p>
+        <Link to={"/products"} className='viewProducts'>View Products</Link>
+    </div>
+  
+   </>
+) :( <>
+
+ 
 <div className="cart-page">
     <div className="cart-items">
         <div className="cart-items-heading">Your Cart</div>
@@ -20,7 +42,8 @@ function Cart() {
                 <div className="header-action item-total-heading">Action</div>
             </div>
             {/* Cart Items */}
-         <CartItem/>
+        {cartItems && cartItems.map((item)=><CartItem item={item} key={item.name}/>)}
+         
          {/* <CartItem/>
          <CartItem/> */}
         </div>
@@ -30,26 +53,28 @@ function Cart() {
     <h3 className="price-summary-heading">Price Summary</h3>
     <div className="summary-item">
         <p className="summary-label">Subtotal : </p>
-        <p className="summary-value">200</p>
+        <p className="summary-value">RS . {subTotal}</p>
     </div>
     <div className="summary-item">
         <p className="summary-label">Tax (13%) </p>
-        <p className="summary-value">26</p>
+        <p className="summary-value">RS . {tax}</p>
     </div>
     <div className="summary-item">
         <p className="summary-label">Shipping </p>
-        <p className="summary-value">25</p>
+        <p className="summary-value">RS . {shippingCharge}</p>
     </div>
     <div className="summary-total">
         <p className="total-label">Total :</p>
-        <p className="total-value">251</p>
+        <p className="total-value">RS . {totalPrice}</p>
     </div>
     <button className="checkout-btn">Proceed to Checkout</button>
 </div>
 </div>
 
- <Footer/>
- </>
+
+ </>)}
+  <Footer/>
+</>
   )
 }
 
