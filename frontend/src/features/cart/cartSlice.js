@@ -22,7 +22,7 @@ export const addItemsToCart=createAsyncThunk("cart/addItemsToCart",async({id,qua
 const cartSlice= createSlice({
 name:'cart',
 initialState:{
-    cartItems:[],
+    cartItems:JSON.parse(localStorage.getItem("cartItems"))||[],
     loading:false,
     error:null,
     success:false,
@@ -58,6 +58,7 @@ state.message=`${item.name} added to Cart Successfully`;
 state.loading=false;
 state.error=null;
 state.success=true;
+localStorage.setItem("cartItems",JSON.stringify(state.cartItems))
 
 
     })
