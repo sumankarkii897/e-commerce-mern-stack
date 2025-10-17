@@ -17,6 +17,8 @@ import UpdatePassword from './User/UpdatePassword'
 import ForgotPassword from './User/ForgotPassword'
 import ResetPassword from './User/ResetPassword'
 import Cart from './Cart/Cart'
+import Shipping from './Cart/Shipping'
+import OrderConfirm from './Cart/OrderConfirm'
 function App() {
   const {isAuthenticated,user}=useSelector(state=>state.user)
   const dispatch=useDispatch()
@@ -40,6 +42,8 @@ function App() {
       <Route path="/reset/:token" element={<ResetPassword/>}/>
     <Route path="/password/update" element={<ProtectedRoutes element={<UpdatePassword/>}/>}/>
       <Route path="/cart" element={<Cart/>}/>
+      <Route path="/shipping" element= {<ProtectedRoutes element={<Shipping/>}/>}/>
+      <Route path="/order/confirm" element= {<ProtectedRoutes element={<OrderConfirm/>}/>}/>
       </Routes>
       {isAuthenticated && <UserDashboard user={user}/>}
       

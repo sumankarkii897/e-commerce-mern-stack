@@ -1,5 +1,6 @@
 import {createSlice,createAsyncThunk} from "@reduxjs/toolkit"
 import axios  from "axios"
+import { Navigate } from "react-router-dom";
 /* add items to cart */
 export const addItemsToCart=createAsyncThunk("cart/addItemsToCart",async({id,quantity},{rejectwithValue})=>{
     try {
@@ -27,7 +28,8 @@ initialState:{
     error:null,
     success:false,
     message:null,
-    removingId:null
+    removingId:null,
+    shippingInfo:JSON.parse(localStorage.getItem("cartItems")) ||{}
 },
 reducers:{
     removeError:(state)=>{
@@ -41,6 +43,12 @@ state.error=null
         state.cartItems=state.cartItems.filter((item)=>item.product!=action.payload)
         localStorage.setItem("cartItems",JSON.stringify(state.cartItems));
         state.removingId=null;
+
+
+    },
+    saveShippingInfo:(state,action)=>{
+        state.shippingInfo=action.payload
+        localStorage.setItem("shippingInfo",JSON.stringify(state.shippingInfo))
 
     }
 },
@@ -77,5 +85,5 @@ localStorage.setItem("cartItems",JSON.stringify(state.cartItems))
     })
 }
 })
-export const {removeError,removeMessage,removeItemsFromCart}=cartSlice.actions;
+export const {removeError,removeMessage,removeItemsFromCart,saveShippingInfo}=cartSlice.actions;
 export default cartSlice.reducer
