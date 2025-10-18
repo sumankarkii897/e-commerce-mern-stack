@@ -5,7 +5,9 @@ import CheckoutPath from './CheckoutPath'
 import PageTitle from '../components/PageTitle'
 import "../CartStyles/OrderConfirm.css"
 import { useSelector } from 'react-redux'
+import { useNavigate } from 'react-router-dom'
 function OrderConfirm() {
+    const navigate=useNavigate()
     const {shippingInfo,cartItems}=useSelector(state=>state.cart)
     // console.log("ShippingInfo",shippingInfo);
     // console.log(cartItems);
@@ -17,7 +19,16 @@ function OrderConfirm() {
     let tax=0.13*subTotal.toFixed(2);
     let shippingCharge=subTotal > 5000 ?500:0;
     let totalPrice=(subTotal+tax+shippingCharge).toFixed(2);
-  
+  const proceedToPayment=()=>{
+    const data={
+        subTotal,
+        tax,
+        shippingCharge,
+        totalPrice
+    }
+    sessionStorage.setItem("orderItem",JSON.stringify(data))
+    navigate("/proceed/payment")
+  }
   return (
     <>
     <PageTitle title={"Confirm Order"}/>
@@ -87,7 +98,7 @@ function OrderConfirm() {
 
                 </table>
         </div>
-        <button className="proceed-button">Proceed To Payment</button>
+        <button className="proceed-button" onClick={proceedToPayment}>Proceed To Payment</button>
     </div>
     <Footer/>
     </>

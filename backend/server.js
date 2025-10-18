@@ -19,6 +19,35 @@ process.on("uncaughtException",(err)=>{
     
     
 })
+app.post("/api/verify-esewa", async (req, res) => {
+  const { amt, pid, refId } = req.body; // Data from frontend
+
+  try {
+    const params = new URLSearchParams({
+      amt,
+      rid: refId,
+      pid,
+      scd: "EPAYTEST", // Sandbox merchant code
+    });
+
+    const response = await axios.post(
+      "https://uat.esewa.com.np/epay/transrec",
+      params.toString(),
+      {
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      }
+    );
+
+    if (response.data.includes("<response_code>Success</response_code>")) {
+      res.json({ success: true, message: "Payment verified successfully" });
+    } else {
+      res.json({ success: false, message: "Payment verification failed" });
+    }
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Server error while verifying payment" });
+  }
+});
 const port=process.env.PORT || 3000;
 
 const server=app.listen(port,()=>{
