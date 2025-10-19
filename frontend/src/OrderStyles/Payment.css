@@ -1,4 +1,4 @@
-.payment-container {
+/* .payment-container {
   max-width: 400px;
   margin: 100px auto;
   text-align: center;
@@ -33,4 +33,35 @@
 
 .esewa-btn:hover {
   background-color: #e65c00;
+} */
+.payment-container {
+  text-align: center;
+  padding: 50px 20px;
+  background-color: #f8f9fa;
+  min-height: 80vh;
+}
+
+.payment-container h2 {
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.payment-container p {
+  font-size: 18px;
+  margin-bottom: 30px;
+}
+
+.esewa-btn {
+  background-color: #60bb46;
+  color: white;
+  border: none;
+  padding: 14px 28px;
+  font-size: 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.esewa-btn:hover {
+  background-color: #4aa536;
 }
