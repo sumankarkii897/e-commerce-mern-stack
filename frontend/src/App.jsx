@@ -21,7 +21,7 @@ import Shipping from './Cart/Shipping'
 import OrderConfirm from './Cart/OrderConfirm'
 import Payment from './Cart/Payment'
 import EsewaPayment from "./Cart/EsewaPayment"
-import PaymentSuccess from "./Cart/Payment"
+import PaymentSuccess from "./Cart/PaymentSuccess"
 import PaymentFail from "./Cart/PaymentFail"
 function App() {
   const {isAuthenticated,user}=useSelector(state=>state.user)
