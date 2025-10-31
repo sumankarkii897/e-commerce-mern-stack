@@ -8,8 +8,8 @@ export const createOrder=createAsyncThunk('order/createOrder',async(order,{rejec
                 'Content-Type':"application/json"
             }
         }
-        const data=await axios.post("/api/v1/new/order",order,config)
-        console.log('Order Data:',data);
+        const {data}=await axios.post("/api/v1/new/order",order,config)
+        // console.log('Order Data:',data);
         return data
         
     } catch (error) {

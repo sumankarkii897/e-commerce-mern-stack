@@ -29,7 +29,7 @@ initialState:{
     success:false,
     message:null,
     removingId:null,
-    shippingInfo:JSON.parse(localStorage.getItem("cartItems")) ||{}
+    shippingInfo:JSON.parse(localStorage.getItem("shippingInfo")) ||{}
 },
 reducers:{
     removeError:(state)=>{
@@ -50,6 +50,11 @@ state.error=null
         state.shippingInfo=action.payload
         localStorage.setItem("shippingInfo",JSON.stringify(state.shippingInfo))
 
+    },
+    clearCart:(state)=>{
+        state.cartItems=[];
+        localStorage.removeItem("cartItems")
+        localStorage.removeItem("shippingInfo")
     }
 },
 extraReducers:(builder)=>{
@@ -85,5 +90,5 @@ localStorage.setItem("cartItems",JSON.stringify(state.cartItems))
     })
 }
 })
-export const {removeError,removeMessage,removeItemsFromCart,saveShippingInfo}=cartSlice.actions;
+export const {removeError,removeMessage,removeItemsFromCart,saveShippingInfo,clearCart}=cartSlice.actions;
 export default cartSlice.reducer

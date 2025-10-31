@@ -5,7 +5,8 @@ import HandleError from "../utils/handleError.js"
 import handleAsyncError from "../middleware/handleAsyncError.js"
 // create new order
 export const createNewOrder=handleAsyncError(async(req,res,next)=>{
-    const {shippingInfo,orderItems,paymentInfo,itemPrice,taxPrice,shippingPrice,totalPrice}=req.body;
+    try {
+       const {shippingInfo,orderItems,paymentInfo,itemPrice,taxPrice,shippingPrice,totalPrice}=req.body;
     const order=await Order.create({
         shippingInfo,
         orderItems,
@@ -21,7 +22,12 @@ export const createNewOrder=handleAsyncError(async(req,res,next)=>{
         success:true,
         message:"Order Created Sucessfully .",
         order
-    })
+    })  
+    } catch (error) {
+        console.log(error);
+        
+    }
+   
 }
 )
 // Getting Single Order
