@@ -83,7 +83,23 @@ const orderSlice=createSlice({
         .addCase(getAllMyOrders.rejected,(state,action)=>{
             state.loading=false;
             state.error=action.payload?.message || "Fetching Order Failed"
+        }),
+        /* get Order details */
+         builder
+        .addCase(getOrderDetails.pending,(state)=>{
+            state.loading=true,
+            state.error=null
         })
+        .addCase(getOrderDetails.fulfilled,(state,action)=>{
+            state.loading=false;
+            state.order=action.payload.order;
+            state.success=action.payload.success;
+        })
+        .addCase(getOrderDetails.rejected,(state,action)=>{
+            state.loading=false;
+            state.error=action.payload?.message || "Failed to fetch order details"
+        })
+
     ]
 })
 export const {removeErrors,removeSuccess}=orderSlice.actions
