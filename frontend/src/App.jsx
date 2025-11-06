@@ -23,6 +23,7 @@ import Payment from './Cart/Payment'
 import EsewaPayment from "./Cart/EsewaPayment"
 import PaymentSuccess from "./Cart/PaymentSuccess"
 import PaymentFail from "./Cart/PaymentFail"
+import MyOrders from './Orders/MyOrders'
 function App() {
   const {isAuthenticated,user}=useSelector(state=>state.user)
   const dispatch=useDispatch()
@@ -51,7 +52,10 @@ function App() {
       <Route path="/proceed/payment" element= {<ProtectedRoutes element={<Payment/>}/>}/>
       <Route path="/esewa/payment" element= {<ProtectedRoutes element={<EsewaPayment/>}/>}/>
       <Route path="/payment/success" element= {<ProtectedRoutes element={<PaymentSuccess/>}/>}/>
-      <Route path="/payment/fail" element= {<ProtectedRoutes element={<PaymentFail/>}/>}/>
+      <Route 
+      path="/payment/fail" element= {<ProtectedRoutes element={<PaymentFail/>}/>}/>
+      <Route 
+      path="/orders/user" element= {<ProtectedRoutes element={<MyOrders/>}/>}/>
      
       </Routes>
       {isAuthenticated && <UserDashboard user={user}/>}
