@@ -25,6 +25,7 @@ import PaymentSuccess from "./Cart/PaymentSuccess"
 import PaymentFail from "./Cart/PaymentFail"
 import MyOrders from './Orders/MyOrders'
 import OrderDetails from './Orders/OrderDetails'
+import Dashboard from './Admin/Dashboard'
 function App() {
   const {isAuthenticated,user}=useSelector(state=>state.user)
   const dispatch=useDispatch()
@@ -59,6 +60,9 @@ function App() {
       path="/orders/user" element= {<ProtectedRoutes element={<MyOrders/>}/>}/>
       <Route 
       path="/order/:orderId" element= {<ProtectedRoutes element={<OrderDetails/>}/>}/>
+    
+      <Route 
+      path="/admin/dashboard" element= {<ProtectedRoutes element={<Dashboard/>} adminOnly={true}/>}/>
      
       </Routes>
       {isAuthenticated && <UserDashboard user={user}/>}
