@@ -26,6 +26,7 @@ import PaymentFail from "./Cart/PaymentFail"
 import MyOrders from './Orders/MyOrders'
 import OrderDetails from './Orders/OrderDetails'
 import Dashboard from './Admin/Dashboard'
+import ProductsList from './Admin/ProductsList'
 function App() {
   const {isAuthenticated,user}=useSelector(state=>state.user)
   const dispatch=useDispatch()
@@ -63,6 +64,8 @@ function App() {
     
       <Route 
       path="/admin/dashboard" element= {<ProtectedRoutes element={<Dashboard/>} adminOnly={true}/>}/>
+      <Route 
+      path="/admin/products" element= {<ProtectedRoutes element={<ProductsList/>} adminOnly={true}/>}/>
      
       </Routes>
       {isAuthenticated && <UserDashboard user={user}/>}
