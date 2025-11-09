@@ -6,10 +6,11 @@ import Loader from "../components/Loader"
 import Rating from '../components/Rating'
 import {useDispatch, useSelector} from "react-redux"
 import { useParams } from 'react-router-dom'
-import { getProductDetails, removeErrors } from '../features/products/productSlice'
+import { createReview, getProductDetails, removeErrors, removeSuccess } from '../features/products/productSlice'
 import {toast} from "react-toastify"
 import { addItemsToCart, removeMessage } from '../features/cart/cartSlice'
 function ProductDetails() {
+    const [comment,setComment]=useState("")
     const [userRating,setUserRating]=useState(0)
     const [quantity,setQuantity]=useState(1)
     const handleRatingChange=(newRating)=>{
@@ -40,7 +41,7 @@ toast.warn("Quantity cannot be less than 1" ,{
             return
         }
     }
-   const {loading,error,product}= useSelector((state)=>state.product)
+   const {loading,error,product,reviewSuccess,reviewLoading}= useSelector((state)=>state.product)
    /* cart state */
    const {loading:cartLoading,error:cartError,success,message,cartItems}=useSelector((state)=>state.cart)
    console.log(cartItems);
@@ -79,7 +80,34 @@ if(cartError){
         dispatch(removeMessage())
     }
   },[dispatch,success,message])
-  if(loading){
+
+  const addToCart=()=>{
+    dispatch(addItemsToCart({id,quantity}))
+  }
+  const handleReviewSubmit=(e)=>{
+    e.preventDefault();
+    if(!userRating){
+        toast.error("Please select the rating",{
+            position:"top-center",
+            autoClose:3000
+        })
+        return;
+    }
+    dispatch(createReview({rating:userRating,
+        comment,
+        productId:id
+    }))
+  }
+  useEffect(()=>{
+    if(reviewSuccess){
+        toast.success("Review Submitted Successfully.",{position:"top-center",autoClose:3000})
+        setUserRating(0)
+        setComment("")
+        dispatch(removeSuccess())
+        dispatch(getProductDetails(id))
+    }
+  },[reviewSuccess,id,dispatch])
+    if(loading){
     return (
         <>
         <Navbar/>
@@ -98,9 +126,6 @@ if(cartError){
         <Footer/>
         </>
     )
-  }
-  const addToCart=()=>{
-    dispatch(addItemsToCart({id,quantity}))
   }
   return (
     <>
@@ -136,13 +161,13 @@ if(cartError){
             <button className="add-to-cart-btn" disabled={cartLoading} onClick={addToCart}>{cartLoading ? "Adding  " : "Add to Cart"}</button>
             </>)
             }
-            <form action="" className="review-form">
+            <form action="" className="review-form" onSubmit={handleReviewSubmit}>
                 <h3>Write a Review</h3>
                 <Rating value={0} disabled={false}
                 onRatingChange={handleRatingChange}
                 />
-                <textarea className='review-input' placeholder='Write your review here'></textarea>
-                <button className='submit-review-btn'>Submit Review</button>
+                <textarea className='review-input' placeholder='Write your review here' value={comment} onChange={(e)=>setComment(e.target.value)}required></textarea>
+                <button className='submit-review-btn' disabled={reviewLoading}>{reviewLoading?"Submitting ...":'Submit Review'}</button>
             </form>
             </div>
         </div>
