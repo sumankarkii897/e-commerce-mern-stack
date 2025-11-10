@@ -20,7 +20,7 @@ function Dashboard() {
                     <div className="nav-section">
                         <h3>Products</h3>
                         <Link to={"/admin/products"}><Inventory className='nav-icon'/>All Products</Link>
-                        <Link to={"/admin/products/create"}><AddBox className='nav-icon'/>create Products</Link>
+                        <Link to={"/admin/product/create"}><AddBox className='nav-icon'/>create Products</Link>
                     </div>
                     <div className="nav-section">
                         <h3>User</h3>
