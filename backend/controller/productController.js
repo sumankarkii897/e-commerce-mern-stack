@@ -66,25 +66,185 @@ export const getAllProducts = handleAsyncError(async (req, res,next) => {
   });
 })
 // update product
-export const updateProduct = handleAsyncError(async (req, res,next) => {
+// export const updateProduct = handleAsyncError(async (req, res,next) => {
+//   // const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+//   //   new: true,
+//   //   runValidators: true, // check all validation and accordingly updating the data
+//   // });
+//   let product = await Product.findById(req.params.id);
+//    if (!product) {
+//     // return res.status(500).json({
+//     //   success: false,
+//     //   message: "Product not Found",
+//     // });
+//      return next(new HandleError("Product Not Found",404))
+//   }
+//   let images=[];
+//   if(typeof req.body.image === "string"){
+//     images.push(req.body.image)
+//   }
+//   else if(Array.isArray(req.body.image)){
+// images=req.body.image;
+//   }
   
- const product = await Product.findByIdAndUpdate(req.params.id, req.body, {
-    new: true,
-    runValidators: true, // check all validation and accordingly updating the data
-  });
+//  if(images.length > 0){
+//   for(let i =0 ;i<product.image.length;i++){
+// await cloudinary.uploader.destroy(product.image[i].public_id)
+//   }
+//   /* Uplod new images */
+//   const imageLinks=[]
+//   for(let i=0;i<images.length;i++){
+//      /* uploading new images */
+// const result=await cloudinary.uploader.upload(images[i],{folder:"products"})
+// imageLinks.push({
+//   public_id:result.public_id,
+//   url:result.secure_url
+// })
+//   }
+//   req.body.image=imageLinks
+ 
+//  }
+//    product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+//     new: true,
+//     runValidators: true, // check all validation and accordingly updating the data
+//   });
+ 
+//   res.status(200).json({
+//     success: true,
+//     product,
+   
+//   });
+// })
+export const updateProduct = handleAsyncError(async (req, res, next) => {
+  let product = await Product.findById(req.params.id);
   if (!product) {
-    // return res.status(500).json({
-    //   success: false,
-    //   message: "Product not Found",
-    // });
-     return next(new HandleError("Product Not Found",404))
+    return next(new HandleError("Product Not Found", 404));
   }
+
+  let images = [];
+  if (typeof req.body.image === "string") {
+    images.push(req.body.image);
+  } else if (Array.isArray(req.body.image)) {
+    images = req.body.image;
+  }
+
+  // Only process if new images are provided
+  if (images.length > 0) {
+    // Delete old images from Cloudinary
+    for (let i = 0; i < product.image.length; i++) {
+      await cloudinary.uploader.destroy(product.image[i].public_id);
+    }
+
+    const imageLinks = [];
+
+    for (let i = 0; i < images.length; i++) {
+      let imageData = images[i];
+
+      // Check if it's a base64 string
+      if (imageData.startsWith("data:image")) {
+        // Upload base64 directly to Cloudinary
+        const result = await cloudinary.uploader.upload(imageData, {
+          folder: "products",
+          resource_type: "image",
+        });
+
+        imageLinks.push({
+          public_id: result.public_id,
+          url: result.secure_url,
+        });
+      } else {
+        // If it's already a Cloudinary URL (e.g., keeping old image), skip upload
+        imageLinks.push({
+          public_id: extractPublicId(imageData),
+          url: imageData,
+        });
+      }
+    }
+
+    req.body.image = imageLinks;
+  }
+  // If no new images, keep old ones
+  else {
+    delete req.body.image; // Prevent overwriting with empty array
+  }
+
+  product = await Product.findByIdAndUpdate(req.params.id, req.body, {
+    new: true,
+    runValidators: true,
+  });
+
   res.status(200).json({
     success: true,
     product,
-   
   });
-})
+});
+// Helper – turn dataURL → pure base64
+const toBase64 = (dataUrl) => {
+  if (!dataUrl) return dataUrl;
+  return dataUrl.replace(/^data:image\/\w+;base64,/, "");
+};
+
+// export const updateProduct = handleAsyncError(async (req, res, next) => {
+//   let product = await Product.findById(req.params.id);
+//   if (!product) return next(new HandleError("Product Not Found", 404));
+
+//   let images = [];
+//   if (typeof req.body.image === "string") images.push(req.body.image);
+//   else if (Array.isArray(req.body.image)) images = req.body.image;
+
+//   if (images.length > 0) {
+//     // ---- Delete old Cloudinary assets ----
+//     for (const img of product.image) {
+//       await cloudinary.uploader.destroy(img.public_id);
+//     }
+
+//     const imageLinks = [];
+
+//     for (const img of images) {
+//       let base64 = img;
+
+//       // ---- Strip dataURL prefix if present ----
+//       if (img.startsWith("data:image")) {
+//         base64 = toBase64(img);
+//       }
+
+//       // ---- Upload (pure base64 or already-uploaded URL) ----
+//       if (base64.startsWith("http")) {
+//         // keep existing Cloudinary URL (rare case)
+//         imageLinks.push({ public_id: extractPublicId(base64), url: base64 });
+//       } else {
+//         const result = await cloudinary.uploader.upload(
+//           `data:image/png;base64,${base64}`, // Cloudinary also accepts prefixed string
+//           { folder: "products" }
+//         );
+//         imageLinks.push({
+//           public_id: result.public_id,
+//           url: result.secure_url,
+//         });
+//       }
+//     }
+
+//     req.body.image = imageLinks;
+//   } else {
+//     // No new images → keep old ones
+//     delete req.body.image;
+//   }
+
+//   product = await Product.findByIdAndUpdate(
+//     req.params.id,
+//     req.body,
+//     { new: true, runValidators: true }
+//   );
+
+//   res.status(200).json({ success: true, product });
+// });
+
+// Helper: Extract public_id from Cloudinary URL
+function extractPublicId(url) {
+  const parts = url.split("/");
+  const fileWithId = parts[parts.length - 1];
+  return fileWithId.split(".")[0]; // Remove file extension
+}
 // Delete Product
 export const deleteProduct = handleAsyncError(async (req, res,next) => {
   
