@@ -3,7 +3,7 @@ import "../../AdminStyles/UpdateRole.css";
 import Navbar from "../../components/Navbar";
 import PageTitle from "../../components/PageTitle";
 import Footer from "../../components/Footer";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { useState } from "react";
 import { useEffect } from "react";
@@ -14,6 +14,7 @@ function UpdateRole() {
   const {userId }= useParams();
   const { user, loading, success, error } = useSelector((state) => state.admin);
   const dispatch = useDispatch();
+  const navigate=useNavigate()
   useEffect(() => {
     dispatch(getSingleUser(userId));
   }, [dispatch]);
@@ -48,7 +49,8 @@ function UpdateRole() {
             position:"top-center",
             autoClose:3000
         })
-        dispatch(removeSuccess)
+        dispatch(removeSuccess())
+        navigate("/admin/users")
     }
     if(error){
         
@@ -90,7 +92,7 @@ function UpdateRole() {
                 <option value="admin">Admin</option>
               </select>
             </div>
-            <button className="btn btn-primry">Update Role</button>
+            <button className="btn btn-primry">{loading?"Updating ...":"Update Role"}</button>
           </form>
         </div>
       </div>
