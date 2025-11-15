@@ -174,7 +174,7 @@ useEffect(()=>{
             />
         ))   }
           </div>
-          <button className="update-product-submit-btn">Update</button>
+          <button className="update-product-submit-btn">{loading?"Updating":"Update"}</button>
         </form>
       </div>
       <Footer />
