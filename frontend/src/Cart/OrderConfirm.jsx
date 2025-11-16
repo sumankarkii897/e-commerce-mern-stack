@@ -68,7 +68,7 @@ function OrderConfirm() {
                     <tbody>
                         {cartItems.map((cartItem,index)=>(<tr key={index}>
                             <td>
-                                <img src={cartItem.image} alt={cartItem.name} className='product-image'/>
+                                <img src={cartItem.image} alt={cartItem.name} className='order-product-image'/>
                             </td>
                             <td>{cartItem.name }</td>
                             <td>{(cartItem.price.toFixed(2))}</td>

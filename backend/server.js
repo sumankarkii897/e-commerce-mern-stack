@@ -2,7 +2,9 @@ import { Route } from "express";
 import app from "./app.js";
 import dotenv from "dotenv";
 import { connectMongoDatabase } from "./config/db.js";
+if(process.env.NODE_ENV!=='PRODUCTION'){
 dotenv.config({path:'backend/config/config.env'})
+}
 import {v2 as cloudinary} from "cloudinary"
 connectMongoDatabase();
 /* setting cloudinary */

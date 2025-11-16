@@ -9,7 +9,7 @@ import { getOrderDetails } from '../features/order/orderSlice'
 import { StarRateTwoTone } from '@mui/icons-material'
 import Loader from '../components/Loader'
 import { toast } from 'react-toastify'
-import { removeErrors, removeSuccess } from '../features/admin/adminSlice'
+import { removeErrors, removeSuccess, updateOrder } from '../features/admin/adminSlice'
 function UpdateOrder() {
     const [status,setStatus]=useState("")
     const {orderId}=useParams();
@@ -35,7 +35,7 @@ const handleStatusUpdate=()=>{
         })
 return;
     }
-    dispatch(updateorder({orderId,status}))
+    dispatch(updateOrder({orderId,status}))
 }
 useEffect(()=>{
     if(error){
@@ -51,8 +51,9 @@ useEffect(()=>{
             autoClose:3000
         })
         dispatch(removeSuccess())  
+        dispatch(getOrderDetails(orderId))
     }
-},[dispatch,error,success])
+},[dispatch,error,success,orderId])
   return (
  <>
  <Navbar/>
@@ -92,13 +93,13 @@ useEffect(()=>{
     </div>
     <div className="order-status">
         <h2>Update Status</h2>
-     <select className="status-select" value={status} onChange={(e)=>setStatus(e.target.value)}>
+     <select className="status-select" value={status} onChange={(e)=>setStatus(e.target.value)} disabled={loading || orderStatus==="Delivered"}>
         <option value="">Select Status</option>
         <option value="Shipped">Shipped</option>
         <option value="On The Way">On The Way</option>
         <option value="Delivered">Delivered</option>
      </select>
-     <button className="update-button" onClick={handleStatusUpdate}>Update Status</button>
+     <button className="update-button" onClick={handleStatusUpdate} disabled={loading || orderStatus==="Delivered" || !status}>Update Status</button>
     </div>
  </div>)}
  <Footer/>

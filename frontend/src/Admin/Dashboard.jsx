@@ -5,7 +5,21 @@ import Footer from '../components/Footer'
 import "../AdminStyles/Dashboard.css"
 import { AddBox, AttachMoney, CheckCircle, Dashboard as DashboardIcon, Error, Instagram, Inventory, LinkedIn, People, ShoppingCart, Star, YouTube } from '@mui/icons-material'
 import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { fetchAdminProducts, fetchAllOrders } from '../features/admin/adminSlice'
 function Dashboard() {
+  const {products,orders,totalAmount}=useSelector(state=>state.admin);
+  const dispatch=useDispatch();
+  useEffect(()=>{
+    dispatch(fetchAdminProducts())
+    dispatch(fetchAllOrders())
+  },[dispatch])
+  const totalProducts=products.length;
+  const totalOrders=orders.length;
+  const outOfStock=products.filter(product=>product.stock===0).length;
+  const inStock=products.filter(product=>product.stock > 0).length;
+  const totalReviews=products.reduce((acc,product)=>acc+(product.reviews.length || 0),0)
   return (
     <>
     <PageTitle title="Admin Dashboard"/>
@@ -34,7 +48,7 @@ function Dashboard() {
                     </div>
                     <div className="nav-section">
                         <h3>Reviews</h3>
-                        <Link to={"/admin/reviewId"}><Star className='nav-icon'/>All Reviews</Link>
+                        <Link to={"/admin/reviews"}><Star className='nav-icon'/>All Reviews</Link>
                         
                     </div>
                 </nav>
@@ -45,32 +59,32 @@ function Dashboard() {
             <div className="stat-box">
               <Inventory className='icon'/>
               <h3>Total Products</h3>
-              <p>4</p>
+              <p>{totalProducts}</p>
             </div>
             <div className="stat-box">
               <ShoppingCart className='icon'/>
               <h3>Total Orders</h3>
-              <p>5</p>
+              <p>{totalOrders}</p>
             </div>
             <div className="stat-box">
               <Star className='icon'/>
               <h3>Total Reviews</h3>
-              <p>15</p>
+              <p>{totalReviews}</p>
             </div>
             <div className="stat-box">
               <AttachMoney className='icon'/>
               <h3>Total Revenue</h3>
-              <p>1500</p>
+              <p>{totalAmount}</p>
             </div>
             <div className="stat-box">
               <Error className='icon'/>
               <h3>Out Of Stock</h3>
-              <p>5</p>
+              <p>{outOfStock}</p>
             </div>
             <div className="stat-box">
               <CheckCircle className='icon'/>
               <h3>In Stock</h3>
-              <p>15</p>
+              <p>{inStock}</p>
             </div>
 
           </div>
