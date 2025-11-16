@@ -31,6 +31,8 @@ import CreateProduct from './Admin/CreateProduct'
 import UpdateProduct from './Admin/UpdateProduct'
 import UsersList from './features/admin/UsersList'
 import UpdateRole from './features/admin/UpdateRole'
+import OrdersList from './Admin/OrdersList'
+import UpdateOrder from './Admin/UpdateOrder'
 function App() {
   const {isAuthenticated,user}=useSelector(state=>state.user)
   const dispatch=useDispatch()
@@ -79,6 +81,10 @@ function App() {
      
       <Route 
       path="/admin/user/:userId" element= {<ProtectedRoutes element={<UpdateRole/>} adminOnly={true}/>}/>
+     
+      <Route 
+      path="/admin/orders" element= {<ProtectedRoutes element={<OrdersList/>} adminOnly={true}/>}/>
+     <Route path="/admin/order/:orderId" element= {<ProtectedRoutes element={<UpdateOrder/>} adminOnly={true}/>}/>
      
       </Routes>
       {isAuthenticated && <UserDashboard user={user}/>}

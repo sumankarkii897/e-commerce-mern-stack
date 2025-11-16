@@ -1,6 +1,7 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 
+
 /* Fetch all products */
 export const fetchAdminProducts = createAsyncThunk(
   "admin/fetchAdminProducts",
@@ -118,6 +119,39 @@ export const deleteUser=createAsyncThunk("admin/deleteUser",async(userId,{reject
     return rejectWithValue(error.response?.data || "Failed to Delete User")
   }
 })
+/* Fetch all orders */
+export const fetchAllOrders=createAsyncThunk("admin/fetchAllOrders",async(_,{rejectWithValue})=>{
+  try {
+    const {data}=await axios.get("/api/v1/admin/orders")
+    return data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || "Failed to Fetch Orders")
+  }
+})
+/* Delete Order */
+export const deleteOrder=createAsyncThunk("admin/deleteOrder",async(orderId,{rejectWithValue})=>{
+  try {
+    const {data}=await axios.delete(`/api/v1/admin/order/${orderId}`)
+    return data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || "Failed to Delete Order")
+    
+  }
+})
+/* update Orders */
+export const updateOrder=createAsyncThunk("admin/updateOrder",async({orderId,status},{rejectWithValue})=>{
+  try {
+    const config={
+      headers:{
+        "content-Type":"application/json"
+      }
+    }
+    const {data}=await axios.put(`/api/v1/admin/order/${orderId}`,{status},config)
+    return data;
+  } catch (error) {
+    return rejectWithValue(error.response?.data || "Failed to Update Order Status")
+  }
+})
 const adminSlice = createSlice({
   name: "admin",
   initialState: {
@@ -130,6 +164,9 @@ const adminSlice = createSlice({
     users: [],
     user: {},
     message:null,
+    orders:[],
+   totalAmount:0,
+   order:{},
   },
   reducers: {
     removeErrors: (state) => {
@@ -253,6 +290,45 @@ const adminSlice = createSlice({
       .addCase(deleteUser.rejected,(state,action)=>{
         state.loading=false;
         state.error=action.payload?.message || "Failed to Delete User"
+      })
+      builder.addCase(fetchAllOrders.pending,(state)=>{
+        state.loading=true;
+        state.error=null;
+      })
+      .addCase(fetchAllOrders.fulfilled,(state,action)=>{
+        state.loading=false;
+        state.orders=action.payload.orders;
+        state.totalAmount=action.payload.totalAmount;
+      })
+      .addCase(fetchAllOrders.rejected,(state,action)=>{
+        state.loading=false;
+        state.error=action.payload?.message || "Failed to Fetch Order Status"
+      })
+      builder.addCase(deleteOrder.pending,(state)=>{
+        state.loading=true;
+        state.error=null;
+      })
+      .addCase(deleteOrder.fulfilled,(state,action)=>{
+        state.loading=false;
+       state.success=action.payload.success;
+       state.message=action.payload.message;
+      })
+      .addCase(deleteOrder.rejected,(state,action)=>{
+        state.loading=false;
+        state.error=action.payload?.message || "Failed to Fetch Orders"
+      })
+      builder.addCase(updateOrder.pending,(state)=>{
+        state.loading=true;
+        state.error=null;
+      })
+      .addCase(updateOrder.fulfilled,(state,action)=>{
+        state.loading=false;
+       state.success=action.payload.success;
+       state.order=action.payload.order;
+      })
+      .addCase(updateOrder.rejected,(state,action)=>{
+        state.loading=false;
+        state.error=action.payload?.message || "Failed to Update Orders"
       })
   },
 });
